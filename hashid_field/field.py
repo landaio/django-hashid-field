@@ -19,6 +19,9 @@ class HashidFieldMixin(object):
         'invalid': _("'%(value)s' value must be a positive integer or a valid Hashids string."),
         'invalid_hashid': _("'%(value)s' value must be a valid Hashids string."),
     }
+    exact_lookups = ('exact', 'iexact', 'contains', 'icontains')
+    iterable_lookups = ('in',)
+    passthrough_lookups = ('isnull',)
 
     def __init__(self, salt=settings.HASHID_FIELD_SALT, min_length=7, alphabet=Hashids.ALPHABET,
                  allow_int_lookup=settings.HASHID_FIELD_ALLOW_INT_LOOKUP, *args, **kwargs):
