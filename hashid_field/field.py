@@ -36,7 +36,8 @@ class HashidFieldMixin(object):
         self.min_length = min_length
         self.alphabet = alphabet
         if 'allow_int' in kwargs:
-            warnings.warn("The 'allow_int' parameter was renamed to 'allow_int_lookup'.", DeprecationWarning, stacklevel=2)
+            warnings.warn("The 'allow_int' parameter was renamed to 'allow_int_lookup'.", DeprecationWarning,
+                          stacklevel=2)
             allow_int_lookup = kwargs['allow_int']
             del kwargs['allow_int']
         self.allow_int_lookup = allow_int_lookup
@@ -93,15 +94,7 @@ class HashidFieldMixin(object):
             return self.encode_id(value)
 
     def get_lookup(self, lookup_name):
-        if lookup_name in self.exact_lookups:
-            return HashidExactLookup
-        if lookup_name in self.iterable_lookups:
-            return HashidIterableLookup
-        if lookup_name in self.comparison_lookups:
-            return self.comparison_lookups[lookup_name]
-        if lookup_name in self.passthrough_lookups:
-            return super().get_lookup(lookup_name)
-        return None  # Otherwise, we don't allow lookups of this type
+        return super(HashidFieldMixin, self).get_lookup(lookup_name)
 
     def to_python(self, value):
         if isinstance(value, Hashid):
@@ -132,7 +125,8 @@ class HashidFieldMixin(object):
     def contribute_to_class(self, cls, name, **kwargs):
         super().contribute_to_class(cls, name, **kwargs)
         # setattr(cls, "_" + self.attname, getattr(cls, self.attname))
-        setattr(cls, self.attname, HashidDescriptor(self.attname, salt=self.salt, min_length=self.min_length, alphabet=self.alphabet))
+        setattr(cls, self.attname,
+                HashidDescriptor(self.attname, salt=self.salt, min_length=self.min_length, alphabet=self.alphabet))
 
 
 class HashidField(HashidFieldMixin, models.IntegerField):

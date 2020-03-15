@@ -88,7 +88,7 @@ class Hashid(object):
         return hash(self._hashid)
 
     def tolist(self):
-        return str(self)
+        return self._id
 
     def __reduce__(self):
         return (self.__class__, (self._id, self._salt, self._min_length, self._alphabet))
