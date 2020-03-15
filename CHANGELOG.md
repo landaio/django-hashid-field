@@ -4,6 +4,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) 
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.1.1] - 2020-01-15
+### Fixes
+- Fixed security bug where comparison operators (gt, gte, lt, lte) would allow integer lookups regardless of
+  ALLOW_INT_LOOKUP setting.
+- Fixed tests that were relying on allow_int_lookup to be set in other tests.
+
+## [3.1.0] - 2020-01-14
+### Changes
+- Added support for `gt`, `gte`, `lt` and `lte` lookups.
+  - Example: `MyModel.objects.filter(id__gt=100)` (If `allow_int_lookups` is True)
+  - Example: `MyModel.objects.filter(id__gt="Ba9p1AG")`
+  - (Thanks for report from [frossigneux](https://github.com/frossigneux) in Issue [#38]
+
+## [3.0.0] - 2019-12-05
+### Changes
+- Dropped Python 2.7 support. 
+- Added Python 3.8 support. 
+- Added official support for Django 3.0
+- Added official support for Django Rest Framework 3.10.
+- (Thanks [hhamana](https://github.com/hhamana))
+
 ## [2.1.6] - 2019-04-02
 ### Changes
 - Added official support for Django 2.2 LTS.
@@ -145,6 +166,8 @@ with 1.11 and DRF 3.7.3, so we are supporting (and testing) DRF 3.6.4 for Django
 ### Added
 - Initial release
 
+[3.1.0]: https://github.com/nshafer/django-hashid-field/compare/3.0.0...3.1.0
+[3.0.0]: https://github.com/nshafer/django-hashid-field/compare/2.1.6...3.0.0
 [2.1.6]: https://github.com/nshafer/django-hashid-field/compare/2.1.5...2.1.6
 [2.1.5]: https://github.com/nshafer/django-hashid-field/compare/2.1.4...2.1.5
 [2.1.4]: https://github.com/nshafer/django-hashid-field/compare/2.1.3...2.1.4
@@ -167,3 +190,4 @@ with 1.11 and DRF 3.7.3, so we are supporting (and testing) DRF 3.6.4 for Django
 [#27]: https://github.com/nshafer/django-hashid-field/issues/27
 [#29]: https://github.com/nshafer/django-hashid-field/issues/29
 [#30]: https://github.com/nshafer/django-hashid-field/pull/30
+[#38]: https://github.com/nshafer/django-hashid-field/issues/38

@@ -4,11 +4,12 @@ import django
 from django import forms
 from django.core import exceptions, checks
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.contrib.admin import widgets as admin_widgets
 from hashids import Hashids
 
-from .lookups import HashidLookup, HashidIterableLookup
+from .lookups import HashidExactLookup, HashidIterableLookup
+from .lookups import HashidGreaterThan, HashidGreaterThanOrEqual, HashidLessThan, HashidLessThanOrEqual
 from .descriptor import HashidDescriptor
 from .hashid import Hashid
 from .conf import settings
@@ -22,6 +23,12 @@ class HashidFieldMixin(object):
     exact_lookups = ('exact', 'iexact', 'contains', 'icontains')
     iterable_lookups = ('in',)
     passthrough_lookups = ('isnull',)
+    comparison_lookups = {
+        'gt': HashidGreaterThan,
+        'gte': HashidGreaterThanOrEqual,
+        'lt': HashidLessThan,
+        'lte': HashidLessThanOrEqual,
+    }
 
     def __init__(self, salt=settings.HASHID_FIELD_SALT, min_length=7, alphabet=Hashids.ALPHABET,
                  allow_int_lookup=settings.HASHID_FIELD_ALLOW_INT_LOOKUP, *args, **kwargs):
@@ -29,21 +36,20 @@ class HashidFieldMixin(object):
         self.min_length = min_length
         self.alphabet = alphabet
         if 'allow_int' in kwargs:
-            warnings.warn("The 'allow_int' parameter was renamed to 'allow_int_lookup'.", DeprecationWarning,
-                          stacklevel=2)
+            warnings.warn("The 'allow_int' parameter was renamed to 'allow_int_lookup'.", DeprecationWarning, stacklevel=2)
             allow_int_lookup = kwargs['allow_int']
             del kwargs['allow_int']
         self.allow_int_lookup = allow_int_lookup
-        super(HashidFieldMixin, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def deconstruct(self):
-        name, path, args, kwargs = super(HashidFieldMixin, self).deconstruct()
+        name, path, args, kwargs = super().deconstruct()
         kwargs['min_length'] = self.min_length
         kwargs['alphabet'] = self.alphabet
         return name, path, args, kwargs
 
     def check(self, **kwargs):
-        errors = super(HashidFieldMixin, self).check(**kwargs)
+        errors = super().check(**kwargs)
         errors.extend(self._check_alphabet_min_length())
         errors.extend(self._check_salt_is_set())
         return errors
@@ -87,7 +93,15 @@ class HashidFieldMixin(object):
             return self.encode_id(value)
 
     def get_lookup(self, lookup_name):
-        return super(HashidFieldMixin, self).get_lookup(lookup_name)
+        if lookup_name in self.exact_lookups:
+            return HashidExactLookup
+        if lookup_name in self.iterable_lookups:
+            return HashidIterableLookup
+        if lookup_name in self.comparison_lookups:
+            return self.comparison_lookups[lookup_name]
+        if lookup_name in self.passthrough_lookups:
+            return super().get_lookup(lookup_name)
+        return None  # Otherwise, we don't allow lookups of this type
 
     def to_python(self, value):
         if isinstance(value, Hashid):
@@ -116,10 +130,9 @@ class HashidFieldMixin(object):
         return hashid.id
 
     def contribute_to_class(self, cls, name, **kwargs):
-        super(HashidFieldMixin, self).contribute_to_class(cls, name, **kwargs)
+        super().contribute_to_class(cls, name, **kwargs)
         # setattr(cls, "_" + self.attname, getattr(cls, self.attname))
-        setattr(cls, self.attname,
-                HashidDescriptor(self.attname, salt=self.salt, min_length=self.min_length, alphabet=self.alphabet))
+        setattr(cls, self.attname, HashidDescriptor(self.attname, salt=self.salt, min_length=self.min_length, alphabet=self.alphabet))
 
 
 class HashidField(HashidFieldMixin, models.IntegerField):
@@ -130,7 +143,7 @@ class HashidField(HashidFieldMixin, models.IntegerField):
         defaults.update(kwargs)
         if defaults.get('widget') == admin_widgets.AdminIntegerFieldWidget:
             defaults['widget'] = admin_widgets.AdminTextInputWidget
-        return super(HashidField, self).formfield(**defaults)
+        return super().formfield(**defaults)
 
 
 class HashidAutoField(HashidFieldMixin, models.AutoField):

@@ -24,6 +24,7 @@ Features
 * Supports exact ID searches in Django Admin when field is specified in search_fields.
 * Supports common filtering lookups, such as ``__iexact``, ``__contains``, ``__icontains``, though matching is the same as ``__exact``.
 * Supports subquery lookups with ``field__in=queryset``
+* Supports other lookups: `isnull`, `gt`, `gte`, `lt` and `lte`.
 * Supports hashing operations so the fields can be used in Dictionaries and Sets.
 
 Requirements
@@ -31,12 +32,12 @@ Requirements
 
 This module is tested and known to work with:
 
-* Python 2.7, 3.6, 3.7
-* Django 1.11, 2.1, 2.2
+* Python 3.6, 3.7, 3.8
+* Django 1.11, 2.2, 3.0
 * Hashids 1.2
-* Django REST Framework 3.9
+* Django REST Framework 3.10
 
-Django versions <= 1.10 and 2.0 will still work for the time being in version 2.1.x, but are deprecated and not tested.
+*Please Note*: Python 2.x is at its end of life and is no longer supported.
 
 Installation
 ------------
@@ -73,7 +74,6 @@ Migrate your database
 
 Upgrading
 ------------
-
 **Potentially breaking changes in 2.0.0** depending on your usage and configuration, specifically if you rely on
 integer lookups (now off by default) or exceptions for invalid lookup values.
 

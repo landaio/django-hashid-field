@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-from __future__ import print_function, unicode_literals
 import os
 import sys
 import warnings
@@ -16,9 +15,9 @@ warnings.simplefilter("error", RuntimeWarning)
 # Ignore known warnings in test dependencies.
 warnings.filterwarnings("ignore", "'U' mode is deprecated", DeprecationWarning, module='docutils.io')
 warnings.filterwarnings("ignore", "Using or importing the ABCs from 'collections' instead of from 'collections.abc' is "
-                        "deprecated, and in 3.8 it will stop working", module='rest_framework')
-warnings.filterwarnings("ignore", "Using or importing the ABCs from 'collections' instead of from 'collections.abc' is "
                         "deprecated, and in 3.8 it will stop working", module='django')
+warnings.filterwarnings("ignore", "Using or importing the ABCs from 'collections' instead of from 'collections.abc' is "
+                        "deprecated since Python 3.3,and in 3.9 it will stop working", module='django')
 
 if __name__ == "__main__":
     print("Python:", sys.version)

@@ -1,7 +1,6 @@
 import sys
 from functools import total_ordering
 
-from django.utils import six
 from hashids import Hashids, _is_uint
 
 
@@ -64,17 +63,14 @@ class Hashid(object):
         return self._id
 
     def __long__(self):
-        if sys.version_info < (3,):
-            return long(self._id)
-        else:
-            return int(self._id)
+        return int(self._id)
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
             return self._id == other._id and self._hashid == other._hashid
-        if isinstance(other, six.string_types):
+        if isinstance(other, str):
             return self._hashid == other
-        if isinstance(other, six.integer_types):
+        if isinstance(other, int):
             return self._id == other
         return NotImplemented
 
@@ -90,9 +86,6 @@ class Hashid(object):
 
     def __hash__(self):
         return hash(self._hashid)
-
-    def tolist(self):
-        return self._id
 
     def __reduce__(self):
         return (self.__class__, (self._id, self._salt, self._min_length, self._alphabet))
